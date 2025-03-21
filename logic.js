@@ -1,10 +1,15 @@
-let snakeArr=[{x:5,y:5}];
-let inputDir = {x: 0, y: 0}; 
+const coordinates =20;
+let snakeArr=[{x:Math.floor(Math.random() * (coordinates - 1 + 1)) + 1,y:Math.floor(Math.random() * (coordinates - 1 + 1)) + 1}];
+let snakeDirection = {x: 0, y: 0}; 
 let snakebody=null;
-let food={x:2,y:5};
+let lastSegment=0;
+let food={x:Math.floor(Math.random() * (coordinates - 1 + 1)) + 1,y:Math.floor(Math.random() * (coordinates - 1 + 1)) + 1};
 let refreshtime=0;
-let speed=2;
+let speed=5;
 let score =0;
+const foodSound = new Audio('Music/food.wav');
+const gameOverSound = new Audio('Music/gameover.wav');
+
 function main(ctime){
     window.requestAnimationFrame(main);
     if((ctime-refreshtime)/ 1000 < 1/speed ){
@@ -13,23 +18,28 @@ function main(ctime){
     refreshtime = ctime;
     startgame();
 }
-function startgame(){
-// Snake move forward
- for (let i = snakeArr.length - 2; i>=0; i--) { 
+
+function MoveSnake(){
+    // Snake move forward
+    for (let i = snakeArr.length - 2; i>=0; i--) { 
         snakeArr[i+1] = {...snakeArr[i]};
     }
-    snakeArr[0].x += inputDir.x;
-    snakeArr[0].y += inputDir.y;
+    snakeArr[0].x += snakeDirection.x;
+    snakeArr[0].y += snakeDirection.y;
+}
+
+
+function DisplaySnake(){
 //Display Snake On Screen
 board.innerHTML="";
 snakeArr.forEach((e,index)=>{
-   snakebody=document.createElement('div');
-   snakebody.style.gridRowStart=e.y;
-   snakebody.style.gridColumnStart=e.x;
-   if(index===0){
-        snakebody.classList.add('head');
+snakebody=document.createElement('div');
+snakebody.style.gridRowStart=e.y;
+snakebody.style.gridColumnStart=e.x;
+if(index===0){
+    snakebody.classList.add('head');
     //To rotate snakes head
-    switch (`${inputDir.x},${inputDir.y}`) {
+    switch (`${snakeDirection.x},${snakeDirection.y}`) {
     case "0,-1":
         snakebody.classList.add("top");
         break;
@@ -49,41 +59,71 @@ snakeArr.forEach((e,index)=>{
     }
    board.appendChild(snakebody);
 });
-//Display Food
-   food1=document.createElement('div');
-   food1.classList.add('food');
-   food1.style.gridRowStart=food.y;
-   food1.style.gridColumnStart=food.x;
-   board.appendChild(food1);
+}
 
+function DisplayFood(){
+    //Display Food
+   food_display=document.createElement('div');
+   food_display.classList.add('food');
+   food_display.style.gridRowStart=food.y;
+   food_display.style.gridColumnStart=food.x;
+   board.appendChild(food_display);
 
-    if(food.x==snakeArr[0].x && food.y==snakeArr[0].y){
+}
+function gameOver(){
+    gameOverSound.play();
+    score = 0;
+    boardscore.innerHTML = "Score: " + score;
+    speed = 5;
+    snakeDirection = { x: 0, y: 0 };
+    food = { x: Math.floor(Math.random() * coordinates), y: Math.floor(Math.random() * coordinates) };
+    snakeArr = [{ x: Math.floor(Math.random() * coordinates), y: Math.floor(Math.random() * coordinates) }];
+}
+function startgame(){
+DisplaySnake()
+MoveSnake();
+DisplayFood();
+
+//Eat Food
+   if(food.x==snakeArr[0].x && food.y==snakeArr[0].y){
         score++;
+        boardscore.innerHTML="Score:"+score;
         speed = speed+1;
-        snakeArr.unshift({x: snakeArr[0].x + inputDir.x, y: snakeArr[0].y + inputDir.y});
-        food.x=Math.floor(Math.random() * 31) + 1;
-        food.y=Math.floor(Math.random() * 31) + 1;
+        foodSound.play();
+        lastSegment = snakeArr[snakeArr.length - 1];
+        snakeArr.push({ x: lastSegment.x, y: lastSegment.y });
+        food={x:Math.floor(Math.random() * (coordinates - 1 + 1)) + 1,y:Math.floor(Math.random() * (coordinates - 1 + 1)) + 1};
+    }
+    //Collision
+    if(snakeArr[0].x>20||snakeArr[0].y>20||snakeArr[0].x<=-1||snakeArr[0].y<=-1){
+        gameOver();
+    }
+    // Check for Self-Collision
+    for (let i = 2; i < snakeArr.length; i++) {
+        if (snakeArr[i].x === snakeArr[0].x && snakeArr[i].y === snakeArr[0].y) {
+           gameOver();
+        }
     }
 }
 window.requestAnimationFrame(main);
 window.addEventListener('keydown',(e)=>{
-    inputDir = {x: 0, y: 1} // Start the game
+    snakeDirection = {x: 1, y: 0} // Start the game
     switch(e.key){
          case "ArrowUp":
-            inputDir.x = 0;
-            inputDir.y = -1;
+            snakeDirection.x = 0;
+            snakeDirection.y = -1;
             break;
          case "ArrowDown":
-            inputDir.x = 0;
-            inputDir.y = 1;
+            snakeDirection.x = 0;
+            snakeDirection.y = 1;
             break;
         case "ArrowLeft":
-            inputDir.x = -1;
-            inputDir.y = 0;
+            snakeDirection.x = -1;
+            snakeDirection.y = 0;
             break;
         case "ArrowRight":
-            inputDir.x = 1;
-            inputDir.y = 0;
+            snakeDirection.x = 1;
+            snakeDirection.y = 0;
             break;
         default:
             break;

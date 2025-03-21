@@ -1,37 +1,40 @@
 body{
 	background:#fff;
+	min-height: 100vh;
+    background-size: 100vw 100vh;
+	background:#181a1d;
+	position: fixed;
 	display: flex;
-	justify-content: center;
-	align-items:center ;
-	max-height: 100vh;
+	gap:10px;
+	justify-content: space-between;
 }
-#score{
-	position: absolute;
-    top: 9px;
-    right:10px;
-    font-size: 39px;
+.game_details{
+    font-size: 35px;
     font-weight: bold;
-    font-family: 'New Tegomin', serif;
-    color:red;
+    color:#fff;
+    text-align: center;
+    padding:20px;
 }
 #board{
-		
-	height: 90vh;
-	width: 80vw;
+	height:90vh;
+	width:80vw;
 	background:#181a1d;
 	display: grid;
 	grid-template-rows: repeat(20,1fr);
 	grid-template-columns: repeat(20,1fr);
-	
+	border:10px dashed red;
 }
 .head{
 	background-color: #2ECC40;
-	border:10px solid green;
+	border:5px solid #2ECC40;
 	box-shadow: 0 0 5px #2ECC40;
+	border-radius:30px;
 }
 .snake{
-    background-color: purple;
-    border: .25vmin solid #2ECC40;
+    background-color: #fff000;
+    border: 5px solid #fff;
+    box-shadow: 0 0 5px #2ECC40;
+	border-radius:20px;
 }
 .top{
 	border-top-right-radius: 150px;
@@ -54,6 +57,21 @@ body{
 	border-right-color: yellow;
 }
 .food{
-	background: blue;
-	border-radius:100%;
+	background:#fff000;
+	border:3px solid #fff;
+	border-radius:10px;
+	height:25px;
+	width:25px;
+	animation-name:foodanimation;
+	animation-duration: 0.3s;
+	animation-iteration-count:infinite;
+	transition:0.1s;
+}
+@keyframes foodanimation{
+	from{
+		scale:1.5;
+	}
+	to{
+		scale:1;
+	}
 }
